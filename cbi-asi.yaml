@@ -1,0 +1,125 @@
+substitutions:
+  name: "cbi-asi"
+  friendly_name: "Astute Smart Isolator"
+  comment: "The Astute Smart Isolator is an energy monitoring, scheduling and control switch with load management and automation capability."
+  project_name: "wernerhp.esphome_cbi_astute_smart_isolator"
+  project_version: "1.0.0"
+
+  button_1_pin: PA22
+  relay_1_pin: PA12
+  led_i_blue_pin: PA05
+  led_i_red_pin: PA23
+  sel_i_pin: PA19
+  cf_pin: PA15
+  cf1_pin: PA14
+  voltage_divider: "1742"
+
+esphome:
+  name: ${name}
+  friendly_name: ${friendly_name}
+  comment: ${comment}
+  # name_add_mac_suffix: true
+  
+  project:
+    name: ${project_name}
+    version: ${project_version}
+
+libretuya:
+  board: wr3e
+  framework:
+    version: latest
+
+# Enable logging
+logger:
+
+# Enable Home Assistant API
+api:
+
+ota:
+
+wifi:
+  ap:
+
+web_server:
+  port: 80
+
+binary_sensor:
+  - platform: gpio
+    pin: ${button_1_pin}
+    name: "Power Button"
+    filters:
+      - delayed_on: 10ms
+      - delayed_off: 10ms
+    on_press:
+      - switch.toggle: relay_1
+    internal: true
+
+switch:
+  - platform: gpio
+    pin: ${relay_1_pin}
+    name: "Relay 1"
+    id: relay_1 
+    on_turn_on:
+      - light.turn_on: light_1
+    on_turn_off:
+      - light.turn_off: light_1
+
+light:
+  - platform: binary
+    id: light_1
+    output: led_1
+
+output:
+  - platform: gpio
+    pin: ${led_i_red_pin}
+    inverted: true
+    id: led_1
+
+status_led:
+    pin:
+      number: ${led_i_blue_pin}
+      inverted: true
+
+button:   
+  - platform: restart
+    name: "Restart"
+
+sensor:
+  - platform: hlw8012
+    model: BL0937
+    sel_pin:
+      number: ${sel_i_pin}
+      inverted: true
+    cf_pin: ${cf_pin}
+    cf1_pin: ${cf1_pin}
+    voltage_divider: ${voltage_divider}
+    current:
+      name: "Current"
+    voltage:
+      name: "Voltage"
+    power:
+      name: "Power"
+    energy:
+      name: "Energy"
+    update_interval: 10s
+
+  - platform: uptime
+    name: "Uptime"
+
+  - platform: wifi_signal
+    name: "WiFi Signal"
+
+text_sensor:
+  - platform: version
+    name: "ESPHome Version"
+
+  - platform: wifi_info
+    ip_address:
+      name: 'IP Address'
+      icon: mdi:wifi
+    ssid:
+      name: 'SSID'
+      icon: mdi:wifi-strength-2
+    bssid:
+      name: 'BSSID'
+      icon: mdi:wifi-strength-2
