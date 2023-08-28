@@ -2,7 +2,7 @@ substitutions:
   name: "cbi-asi"
   friendly_name: "Astute Smart Isolator"
   comment: "The Astute Smart Isolator is an energy monitoring, scheduling and control switch with load management and automation capability."
-  project_name: "wernerhp.esphome_cbi_astute_smart_isolator"
+  project_name: "esphome.cbi_astute_smart_isolator "
   project_version: "1.0.0"
 
   button_1_pin: PA22
@@ -18,16 +18,15 @@ esphome:
   name: ${name}
   friendly_name: ${friendly_name}
   comment: ${comment}
-  # name_add_mac_suffix: true
   
   project:
     name: ${project_name}
     version: ${project_version}
 
-libretuya:
+rtl87xx:
   board: wr3e
   framework:
-    version: latest
+    version: dev
 
 # Enable logging
 logger:
@@ -57,7 +56,7 @@ binary_sensor:
 switch:
   - platform: gpio
     pin: ${relay_1_pin}
-    name: "Relay 1"
+    name: "Relay"
     id: relay_1 
     on_turn_on:
       - light.turn_on: light_1
@@ -90,18 +89,33 @@ sensor:
     sel_pin:
       number: ${sel_i_pin}
       inverted: true
-    cf_pin: ${cf_pin}
-    cf1_pin: ${cf1_pin}
+    cf_pin: 
+      number: ${cf_pin}
+      inverted: true
+    cf1_pin: 
+      number: ${cf1_pin}
+      inverted: true
     voltage_divider: ${voltage_divider}
+    change_mode_every: 3
+    update_interval: 3s
+    # Current sensor
     current:
       name: "Current"
+      unit_of_measurement: A
+      accuracy_decimals: 3      
+    # Voltage sensor
     voltage:
       name: "Voltage"
+      unit_of_measurement: V
+      accuracy_decimals: 1
+    # Power sensor
     power:
+      id: power
       name: "Power"
+      unit_of_measurement: W
+      accuracy_decimals: 0
     energy:
       name: "Energy"
-    update_interval: 10s
 
   - platform: uptime
     name: "Uptime"
